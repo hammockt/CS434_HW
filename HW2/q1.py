@@ -13,6 +13,32 @@ def normalize_columns(matrix):
 	""" normalizes all of the columns in the given matrix to [0,1] """
 	return (matrix - matrix.min(0)) / matrix.ptp(0)
 
+def calc_point_distance(matrix):
+	""" create the data structures to determine the k closest points, from a point """
+	#a hashtable of distances between two points, so we won't have to re-compute
+	#key = tuple(point_1, point2), value = distance between the points
+	distances = {}
+
+	closest_pairs = []
+	for i, point1 in enumerate(matrix):
+		point_distances = []
+
+		for j, point2 in enumerate(matrix):
+			if i == j:
+				continue
+
+			key = (i, j)
+			if key not in distances:
+				distances[key] = distances[(j, i)] = numpy.linalg.norm(point1 - point2)
+
+			distance = distances[key]
+			point_distances.append((j, distance))
+
+		point_distances.sort(key=lambda item: item[1])
+		closest_pairs.append(point_distances)
+
+	return closest_pairs
+
 def main():
 	""" entry point """
 	if len(sys.argv) != 4:
@@ -66,6 +92,8 @@ def main():
 	#	don't put the point in it's own array
 	#	if that happens then all arrays will contain their index as their first-ish element
 	#	we can validate this by checking that the array does not contain it's own index
+	training_closest_pairs = calc_point_distance(training_x)
+	test_closest_pairs = calc_point_distance(test_x)
 
 	###########################################################
 	# classify/guess the y-values using our knn closest pairs #
