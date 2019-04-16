@@ -27,9 +27,9 @@ def calc_point_distance(matrix):
 			if i == j:
 				continue
 
-			key = (i, j)
+			key = (min(i, j), max(i, j))
 			if key not in distances:
-				distances[key] = distances[(j, i)] = numpy.linalg.norm(point1 - point2)
+				distances[key] = numpy.linalg.norm(point1 - point2)
 
 			distance = distances[key]
 			point_distances.append((j, distance))
@@ -102,6 +102,8 @@ def main():
 	#machine learning stuff
 	#also the popular vote is flawed
 	#so we should implement a electoral college system instead for our knn selection
+
+	print(training_closest_pairs[0][:k])
 
 	###################################
 	# get the training and test error #
