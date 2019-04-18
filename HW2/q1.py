@@ -32,14 +32,19 @@ def knn(matrix_x, matrix_y, point, k, ignore_itself=False):
 			ignore_itself = False
 			continue
 
-		item = (matrix_y[i], distance_squared(point, m_point))
+		item = (-distance_squared(point, m_point), matrix_y[i])
 		point_distances.append(item)
 
 	#sort by the items distance
-	point_distances.sort(key=lambda item: item[1])
+	point_distances.sort(key=lambda item: item[0], reverse=True)
 
 	#mode of the k closest points
-	return statistics.mode([item[0] for item in point_distances[:k]])
+	y_vals = {item[1]: (0, 0) for item in point_distances[:k]}
+	for item in point_distances[:k]:
+		y_vals[item[1]] = (y_vals[item[1]][0] + 1, y_vals[item[1]][1] + item[0])
+	y_vals_list = [(y_val, y_vals[y_val][0], y_vals[y_val][1]) for y_val in y_vals]
+	y_vals_list.sort(key=lambda x: (x[1], x[2]), reverse=True)
+	return y_vals_list[0][0]
 
 def total_wrong(expected_y, y):
 	""" gives the percentage of wrong guesses in expected_y """
