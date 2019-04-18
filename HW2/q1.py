@@ -4,6 +4,7 @@ implementation for part1
 
 import sys
 import math
+import heapq
 import statistics
 import numpy
 
@@ -32,14 +33,14 @@ def knn(matrix_x, matrix_y, point, k, ignore_itself=False):
 			ignore_itself = False
 			continue
 
-		item = (matrix_y[i], distance_squared(point, m_point))
-		point_distances.append(item)
-
-	#sort by the items distance
-	point_distances.sort(key=lambda item: item[1])
+		item = (-1*distance_squared(point, m_point), matrix_y[i])
+		if len(point_distances) < k:
+			heapq.heappush(point_distances, item)
+		elif item[0] > point_distances[0][0]:
+			heapq.heappushpop(point_distances, item)
 
 	#mode of the k closest points
-	return statistics.mode([item[0] for item in point_distances[:k]])
+	return statistics.mode([item[1] for item in point_distances])
 
 def total_wrong(expected_y, y):
 	""" gives the percentage of wrong guesses in expected_y """
