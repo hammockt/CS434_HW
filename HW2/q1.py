@@ -3,6 +3,8 @@ implementation for part1
 """
 
 import sys
+import math
+import statistics
 import numpy
 
 numpy.set_printoptions(suppress=True)
@@ -12,6 +14,38 @@ numpy.set_printoptions(suppress=True)
 def normalize_columns(matrix):
 	""" normalizes all of the columns in the given matrix to [0,1] """
 	return (matrix - matrix.min(0)) / matrix.ptp(0)
+
+def distance_squared(point1, point2):
+	""" calculates the distance^2 between two points """
+	diff = point1 - point2
+	return numpy.dot(diff, diff)
+
+#leave-one-out cross validation is basically the point ignoring itself from our
+#	model when the matrix is the training data
+#rather than removing and readding the point, we can just ignore it
+#however since there can be duplicates of the point, we only want to ignore it once
+def knn(matrix_x, matrix_y, point, k, ignore_itself=False):
+	""" predicts point's y value based off of it's closest members in matrix """
+	point_distances = []
+	for i, m_point in enumerate(matrix_x):
+		if(ignore_itself and (m_point == point).all()):
+			ignore_itself = False
+			continue
+
+		item = (matrix_y[i], distance_squared(point, m_point))
+		point_distances.append(item)
+
+	#sort by the items distance
+	point_distances.sort(key=lambda item: item[1])
+
+	#mode of the k closest points
+	return statistics.mode([item[0] for item in point_distances[:k]])
+
+def total_wrong(expected_y, y):
+	""" gives the percentage of wrong guesses in expected_y """
+	diff = expected_y - y
+	num_wrong = len([value for value in diff if not math.isclose(value, 0.0)])
+	return num_wrong / len(y)
 
 def main():
 	""" entry point """
@@ -43,45 +77,20 @@ def main():
 	training_x = normalize_columns(training_x)
 	test_x = normalize_columns(test_x)
 
-	#######################################################
-	# create data structures for finding k closest points #
-	#######################################################
-
-	#point = row in x and y datasets
-	#create a array
-	#array = [point_1, point_2, ..., point_n]
-	#	where array contains all other points that are sorted by distance from point
-	#	this means that point_1 should be the closest to the point
-	#advantages:
-	#	can get k closest pairs in constant time
-	#	this means we can get k closest pairs, n times in O(n)
-	#	which may be nice when we need to do this for 51 different k
-	#disadvantages:
-	#	bare minimum O(n^2) to compute this, but I do have a O(n log n) from a 325 assignment
-	#	space complexity of O(n^2)
-	#	but we can save space by just storing the indexes of the points/rows
-	#	we should really do this because it also makes looking up the corresponding y value trivial
-	#		which we will need to done in the knn classification
-	#possible bugs:
-	#	don't put the point in it's own array
-	#	if that happens then all arrays will contain their index as their first-ish element
-	#	we can validate this by checking that the array does not contain it's own index
-
 	###########################################################
 	# classify/guess the y-values using our knn closest pairs #
 	###########################################################
 
-	#machine learning stuff
-	#also the popular vote is flawed
-	#so we should implement a electoral college system instead for our knn selection
+	expected_training_y = [knn(training_x, training_y, point, k) for point in training_x]
+	expected_validation_y = [knn(training_x, training_y, point, k, True) for point in training_x]
+	expected_test_y = [knn(training_x, training_y, point, k) for point in test_x]
 
 	###################################
 	# get the training and test error #
 	###################################
 
-	#diff = expected_y - y
-	#total_wrong = where diff_i != 0
-	#accuracy = total_wrong / total
-	#WARNING: y is either -1 or 1
+	print("training error:      {0:.2f}".format(total_wrong(expected_training_y, training_y)))
+	print("leave-one-out error: {0:.2f}".format(total_wrong(expected_validation_y, training_y)))
+	print("testing error:       {0:.2f}".format(total_wrong(expected_test_y, test_y)))
 
 main()
