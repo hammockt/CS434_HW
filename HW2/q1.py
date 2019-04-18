@@ -4,7 +4,7 @@ implementation for part1
 
 import sys
 import math
-import statistics
+import heapq
 import numpy
 
 numpy.set_printoptions(suppress=True)
@@ -32,15 +32,15 @@ def knn(matrix_x, matrix_y, point, k, ignore_itself=False):
 			ignore_itself = False
 			continue
 
-		item = (-distance_squared(point, m_point), matrix_y[i])
-		point_distances.append(item)
-
-	#sort by the items distance
-	point_distances.sort(key=lambda item: item[0], reverse=True)
+		item = (-1*distance_squared(point, m_point), matrix_y[i])
+		if len(point_distances) < k:
+			heapq.heappush(point_distances, item)
+		elif item[0] > point_distances[0][0]:
+			heapq.heappushpop(point_distances, item)
 
 	#mode of the k closest points
-	y_vals = {item[1]: (0, 0) for item in point_distances[:k]}
-	for item in point_distances[:k]:
+	y_vals = {item[1]: (0, 0) for item in point_distances}
+	for item in point_distances:
 		y_vals[item[1]] = (y_vals[item[1]][0] + 1, y_vals[item[1]][1] + item[0])
 	y_vals_list = [(y_val, y_vals[y_val][0], y_vals[y_val][1]) for y_val in y_vals]
 	y_vals_list.sort(key=lambda x: (x[1], x[2]), reverse=True)
