@@ -4,7 +4,6 @@ implementation for part2
 
 import sys
 import math
-import statistics
 import numpy
 
 numpy.set_printoptions(suppress=True)
@@ -27,28 +26,36 @@ class Node():
         self.x_vals = x_vals
         self.y_vals = y_vals
 
-    def entropy():
+    #https://stackoverflow.com/a/1859910
+    def entropy(self):
         y_counts = {}
         for y_val in self.y_vals:
-            if y_val in y_counts:
-                y_counts[y_val] = 0
+            #python truncates floats if they are used as keys...
+            #play it safe and use the exact string representation as the key instead (str also truncates)
+            key = repr(y_val)
+            if key not in y_counts:
+                y_counts[key] = 0
             else:
-                y_counts[y_val] += 1
+                y_counts[key] += 1
         total_y_count = sum(y_counts.values())
-        u_s = 0
-        for count in y_counts.values():
-            p_val = count / total_y_count
-            u_s -= p_val * math.log2(p_val)
 
-        for child in self.children:
-            u_s -= len(child.y_vals) / total_y_count * child.entropy()
+        #we should probably break this into two separate methods...ehh
+        u_s = 0
+        if not self.children:
+            for count in y_counts.values():
+                p_val = count / total_y_count
+                u_s -= p_val * math.log2(p_val)
+        else:
+            for child in self.children:
+                u_s += len(child.y_vals) / total_y_count * child.entropy()
+
         return u_s
 
 def main():
     """ entry point """
-    if len(argv) != 3:
+    if len(sys.argv) != 3:
         print("Wrong number of arguments!")
-        errmsg = f"Usage: python3 {argv[0]} <training file> <testing file>"
+        errmsg = f"Usage: python3 {sys.argv[0]} <training file> <testing file>"
         sys.exit(errmsg)
 
     ################
@@ -72,20 +79,17 @@ def main():
     training_x = normalize_columns(training_x)
     test_x = normalize_columns(test_x)
 
-    ###########################################################
-    # classify/guess the y-values using our knn closest pairs #
-    ###########################################################
+    basic_node = Node(training_x, training_y)
+    entropy_before = basic_node.entropy()
+    print(f"entropy of root: {entropy_before}")
 
-    expected_training_y = [knn(training_x, training_y, point, k) for point in training_x]
-    expected_validation_y = [knn(training_x, training_y, point, k, True) for point in training_x]
-    expected_test_y = [knn(training_x, training_y, point, k) for point in test_x]
-
-    ###################################
-    # get the training and test error #
-    ###################################
-
-    print("training error:      {0:.2f}".format(total_wrong(expected_training_y, training_y)))
-    print("leave-one-out error: {0:.2f}".format(total_wrong(expected_validation_y, training_y)))
-    print("testing error:       {0:.2f}".format(total_wrong(expected_test_y, test_y)))
+    #basic 50/50 split
+    basic_node.children.append(Node(training_x[:len(training_x)//2], training_y[:len(training_y)//2]))
+    basic_node.children.append(Node(training_x[len(training_x)//2:], training_y[len(training_y)//2:]))
+    entropy_after = basic_node.entropy()
+    print(f"entropy of basic split: {entropy_after}")
+    print(f"information gain: {entropy_before - entropy_after}")
+    print(f"entropy of child 0: {basic_node.children[0].entropy()}")
+    print(f"entropy of child 1: {basic_node.children[1].entropy()}")
 
 main()
