@@ -75,7 +75,7 @@ class Node():
         return u_s
 
     def test(self):
-        best_feature = None
+        best_feature = {}
         for col in range(len(self.x_vals[0])):
             # Get column from x_vals
             feature_vals = [
@@ -94,7 +94,7 @@ class Node():
                 self.children.append(Node(None, y_vals["l"], self))
                 self.children.append(Node(None, y_vals["r"], self))
                 entropy = self.entropy()
-                if best_feature is None or best_feature["entropy"] > entropy:
+                if not best_feature or best_feature["entropy"] > entropy:
                     best_feature = {
                         "feature_index": col,
                         "test_bound": val[1],
@@ -130,7 +130,7 @@ class Node():
     def decision(self):
         try:
             return statistics.mode(self.y_vals)
-        except StatisticsError:
+        except statistics.StatisticsError:
             return self.y_vals[0]
 
 
