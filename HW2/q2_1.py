@@ -42,6 +42,7 @@ class Tree():
 
 
 class Node():
+    """ represents a node in a decision tree """
     def __init__(self, x_vals, y_vals, parent=None):
         self.parent = parent
         self.children = []
@@ -52,6 +53,7 @@ class Node():
 
     #https://stackoverflow.com/a/1859910
     def entropy(self):
+        """ calculates the entropy (uncertainty/randomness) of the node """
         y_counts = {}
         for y_val in self.y_vals:
             #python truncates floats if they are used as keys...
@@ -75,6 +77,7 @@ class Node():
         return u_s
 
     def test(self):
+        """ tests the node to figure out the best way to split the data """
         best_feature = {}
         for col in range(len(self.x_vals[0])):
             # Get column from x_vals
@@ -106,6 +109,7 @@ class Node():
         return best_feature
 
     def test_and_apply(self):
+        """ tests the node and applies the split """
         best_feature = self.test()
         x_vals = ([], [])
         y_vals = ([], [])
@@ -121,13 +125,16 @@ class Node():
         return best_feature
 
     def predicted_value(self, point):
+        """ descends the decision tree to predict the output of a point """
         if not self.children:
             return self.decision()
+
         if point[self.feature] < self.test_bound:
             return self.children[0].predicted_value(point)
         return self.children[1].predicted_value(point)
 
     def decision(self):
+        """ determines how the output is picked on a leaf node """
         try:
             return statistics.mode(self.y_vals)
         except statistics.StatisticsError:
@@ -138,8 +145,7 @@ def main():
     """ entry point """
     if len(sys.argv) != 3:
         print("Wrong number of arguments!")
-        errmsg = f"Usage: python3 {sys.argv[0]} <training file> <testing file>"
-        sys.exit(errmsg)
+        sys.exit(f"Usage: python3 {sys.argv[0]} <training file> <testing file>")
 
     ################
     # get the data #
