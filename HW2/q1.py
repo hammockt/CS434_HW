@@ -55,7 +55,7 @@ def total_wrong(expected_y, y):
 def main():
 	""" entry point """
 	if len(sys.argv) != 4:
-		print("Usage: q1.py train.txt k")
+		print("Usage: q1.py train.txt test.txt k")
 		sys.exit()
 
 	################
