@@ -21,26 +21,6 @@ def total_wrong(expected_y, y):
     num_wrong = len([value for value in diff if not math.isclose(value, 0.0)])
     return num_wrong / len(y)
 
-
-class Tree():
-    def __init__(self, root):
-        self.root = root
-        self.height = self.get_height()
-
-    def get_height(self, node_param=None):
-        if node_param is None:
-            node = self.root
-        else:
-            node = node_param
-        if not node.children:
-            return 0
-        return 1 + max(self.get_height(node.children[0]),
-                       self.get_height(node.children[1]))
-
-    def predicted_value(self, point):
-        return self.root.predicted_value(point)
-
-
 def build_tree(node, depth):
     if depth <= 0:
         return

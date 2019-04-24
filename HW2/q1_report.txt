@@ -1,0 +1,14 @@
+1. Implement knn
+       done
+2. Plot K values 1,3,5,..,51 showing training, leave-one-out cross-validation, and testing error
+       q1_error_graph.svg (I will not make a table for the 100 different k's)
+3. Discuss your observations between the three errors and perform model selection
+       As k increases, generally the three different errors also increase.
+       The trends for leave-one-out cross validation is very similar to the training error.
+       The training error is guaranteed to be equal to or less than the leave-one-out cross validation.
+       The testing error increases very slowly til about k=65, where the slope dramatically increases, which is most likely coincidence.
+       The testing error occasionally can dip below the leave-one-out cross validation and the training error, but this is also a coincidence.
+       For model selection, you generally want to choose k values that produced the lowest cross-validation error.
+       According to our test results, k values between 4 to 6 produced the lowest cross-validation error (2.8%).
+       Additionally for those range of k values, we also observed the testing error to be between 4.6 to 5.3%, which helps reinforce the accuracy of those chosen k values
+
