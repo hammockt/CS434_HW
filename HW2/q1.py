@@ -9,8 +9,10 @@ import numpy
 
 numpy.set_printoptions(suppress=True)
 
-#normalize(x_i) = (x_i - min(x)) / range(x)
-#gets the min and range for each column and uses that to normalize the column
+"""
+normalize(x_i) = (x_i - min(x)) / range(x)
+gets the min and range for each column and uses that to normalize the column
+"""
 def normalize_columns(matrix):
 	""" normalizes all of the columns in the given matrix to [0,1] """
 	return (matrix - matrix.min(0)) / matrix.ptp(0)
@@ -20,10 +22,12 @@ def distance_squared(point1, point2):
 	diff = point1 - point2
 	return numpy.dot(diff, diff)
 
-#leave-one-out cross validation is basically the point ignoring itself from our
-#	model when the matrix is the training data
-#rather than removing and readding the point, we can just ignore it
-#however since there can be duplicates of the point, we only want to ignore it once
+"""
+leave-one-out cross validation is basically the point ignoring itself from our
+	model when the matrix is the training data
+rather than removing and readding the point, we can just ignore it
+however since there can be duplicates of the point, we only want to ignore it once
+"""
 def knn(matrix_x, matrix_y, point, k, ignore_itself=False):
 	""" predicts point's y value based off of it's closest members in matrix """
 	point_distances = []
@@ -32,6 +36,12 @@ def knn(matrix_x, matrix_y, point, k, ignore_itself=False):
 			ignore_itself = False
 			continue
 
+		"""
+		item[0] = negative distance
+		item[1] = the y value of m_point
+		also heapq can either sort comparables or the first value in a tuple
+		i.e. no dictionaries unfortunately
+		"""
 		item = (-1*distance_squared(point, m_point), matrix_y[i])
 		if len(point_distances) < k:
 			heapq.heappush(point_distances, item)
@@ -39,12 +49,22 @@ def knn(matrix_x, matrix_y, point, k, ignore_itself=False):
 			heapq.heappushpop(point_distances, item)
 
 	#mode of the k closest points
-	y_vals = {item[1]: (0, 0) for item in point_distances}
+	y_values = {}
 	for item in point_distances:
-		y_vals[item[1]] = (y_vals[item[1]][0] + 1, y_vals[item[1]][1] + item[0])
-	y_vals_list = [(y_val, y_vals[y_val][0], y_vals[y_val][1]) for y_val in y_vals]
-	y_vals_list.sort(key=lambda x: (x[1], x[2]), reverse=True)
-	return y_vals_list[0][0]
+		if item[1] not in y_values:
+			y_values[item[1]] = {"count": 0, "total_dist": 0, "value": item[1]}
+		y_values[item[1]]["count"] += 1
+		y_values[item[1]]["total_dist"] += item[0]
+
+	"""
+	in python3, dict.values() returns a view instead of a list
+	i.e. we must use sorted() instead of dict.values().sort()
+	"""
+	y_values_list = sorted(y_values.values(),
+	                       key=lambda y_value: (y_value["count"], y_value["total_dist"]),
+	                       reverse=True)
+
+	return y_values_list[0]["value"]
 
 def total_wrong(expected_y, y):
 	""" gives the percentage of wrong guesses in expected_y """
@@ -55,7 +75,7 @@ def total_wrong(expected_y, y):
 def main():
 	""" entry point """
 	if len(sys.argv) != 4:
-		print("Usage: q1.py train.txt test.txt k")
+		print("Usage: q1.py <training file> <testing file> k")
 		sys.exit()
 
 	################
