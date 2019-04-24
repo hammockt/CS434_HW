@@ -76,14 +76,18 @@ def main():
     test_bound = test_info["test_bound"]
     entropy_after = test_info["entropy"]
     info_gain = entropy_before - entropy_after
+    left_classify = int(basic_node.children[0].decision())
+    right_classify = int(basic_node.children[1].decision())
 
     print(f"Feature index of test (decision stump): {feature_index}")
     print(f"Test boundary (decision stump):         {test_bound}")
+    print(f"Classification of left child:           {left_classify}")
+    print(f"Classification of right child:          {right_classify}")
     print(f"Information gain:                       {info_gain}")
 
     expected_training_y = [basic_node.predicted_value(point) for point in training_x]
     expected_test_y = [basic_node.predicted_value(point) for point in test_x]
-    print("Training error:      {0:.2f}".format(total_wrong(expected_training_y, training_y)))
-    print("Testing error:       {0:.2f}".format(total_wrong(expected_test_y, test_y)))
+    print("Training error:      {0:.3f}".format(total_wrong(expected_training_y, training_y)))
+    print("Testing error:       {0:.3f}".format(total_wrong(expected_test_y, test_y)))
 
 main()
