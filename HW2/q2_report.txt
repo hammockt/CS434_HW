@@ -1,0 +1,29 @@
+1. 1) Learned decision stump
+          Feature index: 22
+          Test boundary: 0.37284675258389693
+          Classification of left child: -1
+          Classification of right child: 1
+   2) Information gain: 0.6435368046750327
+   3) Error Rates
+          Training error: 6.0%
+          Testing error: 15.1%
+2. +------------------------------------+
+   | d | Training error | Testing error |
+   +------------------------------------+
+   | 1 |      6.0%      |     15.1%     |
+   +------------------------------------+
+   | 2 |      6.0%      |     15.1%     |
+   +------------------------------------+
+   | 3 |      3.2%      |     12.3%     |
+   +------------------------------------+
+   | 4 |      1.8%      |     11.6%     |
+   +------------------------------------+
+   | 5 |      0.0%      |     12.7%     |
+   +------------------------------------+
+   | 6 |      0.0%      |     12.7%     |
+   +------------------------------------+
+
+   It appears that training error decreases consistently as d increases, whereas testing error decreases as d increases until d = 4, at which point it increases.
+   This is due to overfitting of the data.
+   At depths greater than 4, the testing boundaries fit so closely with the training data that the overarching similarities become lost.
+   This causes the testing data to be less closely matched.
