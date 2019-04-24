@@ -41,25 +41,34 @@ class Tree():
         return self.root.predicted_value(point)
 
 
-def main():
+def build_tree(node, depth):
+    if depth <= 0:
+        return
+    node.test_and_apply()
+    for child in node.children:
+        build_tree(child, depth - 1)
+
+def main(argv):
     """ entry point """
-    if len(sys.argv) != 3:
+    if len(argv) != 4:
         print("Wrong number of arguments!")
-        sys.exit(f"Usage: python3 {sys.argv[0]} <training file> <testing file>")
+        sys.exit(f"Usage: python3 {sys.argv[0]} <training file> <testing file> <d>")
 
     ################
     # get the data #
     ################
 
-    training_data = numpy.genfromtxt(sys.argv[1], delimiter=",")
+    training_data = numpy.genfromtxt(argv[1], delimiter=",")
     #need all but the first column, could be better but I like the verbosity
     training_x = numpy.delete(numpy.copy(training_data), 0, axis=1)
     #need only the first column
     training_y = training_data[:, 0]
 
-    test_data = numpy.genfromtxt(sys.argv[2], delimiter=",")
+    test_data = numpy.genfromtxt(argv[2], delimiter=",")
     test_x = numpy.delete(numpy.copy(test_data), 0, axis=1)
     test_y = test_data[:, 0]
+
+    d = int(argv[3])
 
     ##########################
     # normalize the features #
@@ -69,21 +78,12 @@ def main():
     test_x = normalize_columns(test_x)
 
     basic_node = Node(training_x, training_y)
-    entropy_before = basic_node.entropy()
 
-    test_info = basic_node.test_and_apply()
-    feature_index = test_info["feature_index"]
-    test_bound = test_info["test_bound"]
-    entropy_after = test_info["entropy"]
-    info_gain = entropy_before - entropy_after
-
-    print(f"Feature index of test (decision stump): {feature_index}")
-    print(f"Test boundary (decision stump):         {test_bound}")
-    print(f"Information gain:                       {info_gain}")
+    build_tree(basic_node, d)
 
     expected_training_y = [basic_node.predicted_value(point) for point in training_x]
     expected_test_y = [basic_node.predicted_value(point) for point in test_x]
     print("Training error:      {0:.2f}".format(total_wrong(expected_training_y, training_y)))
     print("Testing error:       {0:.2f}".format(total_wrong(expected_test_y, test_y)))
 
-main()
+main(sys.argv)
