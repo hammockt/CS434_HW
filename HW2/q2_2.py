@@ -83,7 +83,8 @@ def main(argv):
 
     expected_training_y = [basic_node.predicted_value(point) for point in training_x]
     expected_test_y = [basic_node.predicted_value(point) for point in test_x]
-    print("Training error:      {0:.2f}".format(total_wrong(expected_training_y, training_y)))
-    print("Testing error:       {0:.2f}".format(total_wrong(expected_test_y, test_y)))
+    print(f"d:              {d}")
+    print("Training error: {0:.2f}".format(total_wrong(expected_training_y, training_y)))
+    print("Testing error:  {0:.2f}".format(total_wrong(expected_test_y, test_y)))
 
 main(sys.argv)
