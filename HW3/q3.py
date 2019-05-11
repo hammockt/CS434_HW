@@ -7,15 +7,15 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 
 class Net(nn.Module):
-    def __init__(self):
+    def __init__(self, dropout):
         super(Net, self).__init__()
         self.fc1 = nn.Linear(32*32, 100)
-        self.fc1_drop = nn.Dropout(0.2)
+        self.fc1_drop = nn.Dropout(dropout)
         self.fc3 = nn.Linear(100, 10)
 
     def forward(self, x):
         x = x.view(-1, 32*32)
-        x = torch.sigmoid(self.fc1(x))
+        x = F.relu(self.fc1(x))
         x = self.fc1_drop(x)
         return F.log_softmax(self.fc3(x), dim=1)
 
@@ -61,11 +61,13 @@ def validate(model, test_loader, device, accuracy_vector):
     accuracy_vector.append(accuracy)
 
 def main(argv):
-    if len(argv) != 2:
+    if len(argv) != 4:
         print("Wrong number of arguments!")
-        sys.exit(f"Usage: python3 {sys.argv[0]} <learning rate>")
+        sys.exit(f"Usage: python3 {sys.argv[0]} <dropout> <momentum> <weight decay>")
 
-    lr = float(argv[1])
+    dropout = float(argv[1])
+    momentum = float(argv[2])
+    w_decay = float(argv[3])
 
     device = None
     if torch.cuda.is_available():
@@ -118,8 +120,8 @@ def main(argv):
     # Multi-Layer Perceptron Network Class #
     ########################################
 
-    model = Net().to(device)
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.5)
+    model = Net(dropout).to(device)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=momentum, weight_decay=w_decay)
     criterion = nn.CrossEntropyLoss()
 
     #################

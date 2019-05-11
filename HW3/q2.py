@@ -15,7 +15,7 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = x.view(-1, 32*32)
-        x = torch.sigmoid(self.fc1(x))
+        x = F.relu(self.fc1(x))
         x = self.fc1_drop(x)
         return F.log_softmax(self.fc3(x), dim=1)
 

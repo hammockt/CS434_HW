@@ -9,14 +9,18 @@ import matplotlib.pyplot as plt
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(32*32, 100)
+        self.fc1 = nn.Linear(32*32, 50)
         self.fc1_drop = nn.Dropout(0.2)
-        self.fc3 = nn.Linear(100, 10)
+        self.fc2 = nn.Linear(50, 50)
+        self.fc2_drop = nn.Dropout(0.2)
+        self.fc3 = nn.Linear(50, 10)
 
     def forward(self, x):
         x = x.view(-1, 32*32)
-        x = torch.sigmoid(self.fc1(x))
+        x = F.relu(self.fc1(x))
         x = self.fc1_drop(x)
+        x = F.relu(self.fc2(x))
+        x = self.fc2_drop(x)
         return F.log_softmax(self.fc3(x), dim=1)
 
 def train(model, training_loader, device, optimizer, criterion, losses):
@@ -61,11 +65,9 @@ def validate(model, test_loader, device, accuracy_vector):
     accuracy_vector.append(accuracy)
 
 def main(argv):
-    if len(argv) != 2:
+    if len(argv) != 1:
         print("Wrong number of arguments!")
-        sys.exit(f"Usage: python3 {sys.argv[0]} <learning rate>")
-
-    lr = float(argv[1])
+        sys.exit(f"Usage: python3 {sys.argv[0]}")
 
     device = None
     if torch.cuda.is_available():
@@ -119,7 +121,7 @@ def main(argv):
     ########################################
 
     model = Net().to(device)
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.5)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
     criterion = nn.CrossEntropyLoss()
 
     #################
