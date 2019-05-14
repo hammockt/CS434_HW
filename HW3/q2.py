@@ -148,6 +148,6 @@ def main(argv):
     plt.legend(loc="best")
     plt.show()
 
-    print(f"Testing accuracy: {validation_accuracies[0]}")
+    print(f"Testing accuracy: {test_accuracy[0]}")
 
 main(sys.argv)
