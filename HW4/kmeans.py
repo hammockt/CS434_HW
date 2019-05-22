@@ -37,10 +37,11 @@ class Cluster():
 			"""
 			self.centroid = numpy.mean(self.points, axis=0)
 
-	# TODO: should probably throw a runtime error if centroid == None
 	def update_objective(self):
 		""" updates our objective that we want to minimze, which is sse """
 		if self.points:
+			if self.centroid is None:
+				raise RuntimeError("Centroid is None")
 			self.objective = sse(self.points, self.centroid)
 
 class KMeansCluster():
