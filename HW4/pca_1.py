@@ -1,5 +1,5 @@
 """
-Implementation for part 3 of the assignment
+Implementation for part 3.1 of the assignment
 """
 
 import sys

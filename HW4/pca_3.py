@@ -1,5 +1,5 @@
 """
-Implementation for part 3.2 of the assignment
+Implementation for part 3.3 of the assignment
 """
 
 import sys
@@ -7,14 +7,14 @@ import numpy
 import matplotlib.pyplot as plt
 
 
-def show_img(mean, img):
+def show_img(img, dims):
     fig = plt.figure()
-    mean_img = numpy.reshape(mean, (28, 28))
     new_img = numpy.reshape(img, (28, 28))
+    dim_img = numpy.reshape(dims, (2, 5))
     fig.add_subplot(1, 2, 1)
-    plt.imshow(mean_img, cmap="gray", vmin=min(mean), vmax=max(mean))
+    plt.imshow(new_img, cmap="gray", vmin=min(img), vmax=max(img))
     fig.add_subplot(1, 2, 2)
-    plt.imshow(new_img, cmap='gray', vmin=min(img), vmax=max(img))
+    plt.imshow(dim_img, cmap="gray", vmin=min(dims), vmax=max(dims))
     plt.show()
 
 def main(argv):
@@ -34,7 +34,9 @@ def main(argv):
     es = numpy.flip(es)
     # Need to get rows instead of columns
     evs = numpy.flip(evs.T)
+    proj_matrix = (evs[:10]).T
+    reduced_matrix = training_data @ proj_matrix
     for i in range(10):
-        show_img(mean_img, evs[i])
+        show_img(evs[i], reduced_matrix[i])
 
 main(sys.argv)
