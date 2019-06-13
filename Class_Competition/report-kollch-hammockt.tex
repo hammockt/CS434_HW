@@ -1,0 +1,66 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+%\usepackage[colorinlistoftodos]{todonotes}
+
+\title{CS434 Final Project Report (3-page limit)}
+\author{Charles Koll (kollch), Trevor Hammock (hammockt)}
+\date{}
+\begin{document}
+\maketitle
+\section{Data preprocessing}
+Did you pre-process your data in any way? This can be for the purpose of reducing dimension, or reducing noise, or balancing the class distribution. Be clear about what you exactly did. The criterion is to allow others to precisely replicate your works.
+
+We converted the txt files to csv files and split them into training and validation files.
+The validation files had the same ratio of class labels as the original dataset.
+For the 103 training set we created two training sets with 70\% and 80\% training data with corresponding 30\% and 20\% validation data.
+We did this to see the effect that it had on validation accuracy.
+We initially thought the 20\% would perform better considering the way the data was structured, but it did not turn out to be the case.
+Considering what we found for the 103 dataset, we decided to use two training sets with both 70\% training data with corresponding 30\% validation data.
+\section{Learning algorithms}
+\subsection{Algorithms/methods explored}
+Provide a list of learning algorithms that you explored for this project. For each algorithm, briefly justify your rationale for choosing this algorithm.
+
+We initially explored KNN, decision trees using entropy, logistic regression batch learning, and Naive Bayes.
+All of these had inconsistent results with poor training times.
+Considering these, we were led to Gini decision trees, showed considerable higher promise and significant improvements in the training times.
+From there, we discovered a random forest approach which allowed us to use the Gini trees as voting to increase accuracy.
+Inspired by perceptrons, we decided to look at a weighted random forest, in which the most accurate trees are weighted higher in the voting process. Doing so allows for the trees that are outliers to play less of a part in the decisions.
+\subsection{Final models}
+What are the final models that produced your submitted test predictions? Be sure to provide enough detail so that by reading the description, the model can be recreated.
+
+\begin{itemize}
+\item 103 20\% original trees: > 10000
+\item 103 20\% pruned trees: 115
+\item 103 30\% original trees: > 10000
+\item 103 30\% pruned trees: 235
+\item 103 30\% weighted trees: 9435
+\item All 30\%v1 original trees: 1532
+\item All 30\%v1 pruned trees: 138
+\item All 30\%v2 original trees: 2875
+\item All 30\%v2 pruned trees: 137
+\item All 30\%v2 weighted trees: 2875
+\end{itemize}
+\section{Parameter Tuning and Model Selection}
+\subsection{Parameter Tuning}
+What parameters did you tune for your models? How do you perform the parameter tuning?
+
+For random forests, when classifying, typically the square root of the number of features is used for a given split; for regressions, it's typically one-third.
+We tried both of these for the 103 feature set and found that the one-third option produced better results.
+For the full feature set we decided on 103 features for a given split because it produced reasonable training times despite not using one-third of the features.
+When weighting the trees, we used the accuracy of each tree on the validation set.
+We then ran those weights through a sigmoid activation function to allow better-performing trees to be weighted more heavily and worse-performing trees to be weighted more lightly.
+To produce the parameters of the sigmoid, we tried several different values and came up with the best accuracy at $\frac{1}{1 + e^{-200x + 136.25}}$.
+\subsection{Model selection}
+How did you decide which models to use to produce the final predictions?  Do you use cross-validation or hold-out for model selection? When you split the data for validation, is it fully random or special consideration went into forming the folds? What criterion is used to select the models?
+
+For the weighted forest we used all trees in the final predictions.
+For the other random forest, we pruned trees based on the distance between the ground truth and the forest prediction.
+Using an iterative algorithm, we only kept trees that reduced the distance between the ground truth and the forest prediction.
+This allowed us to optimize for both accuracy and confidence in those accuracies, which significantly improved the accuracy of the pruned forest.
+\section{Results}
+Do you have any internal evaluation results you want to report?
+
+When testing our set against the validation sets we generally saw accuracies of about 95\% for 103 features and 94-95\% for all features.
+\end{document}
